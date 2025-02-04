@@ -4,8 +4,36 @@ namespace SpriteKind {
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile0`, function (sprite, location) {
     info.changeLifeBy(-10)
 })
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+	
+})
+function advanceLevel () {
+    sprites.destroyAllSpritesOfKind(SpriteKind.Player)
+    sprites.destroyAllSpritesOfKind(SpriteKind.Projectile)
+    sprites.destroyAllSpritesOfKind(SpriteKind.Food)
+    sprites.destroyAllSpritesOfKind(SpriteKind.Enemy)
+    sprites.destroyAllSpritesOfKind(SpriteKind.enemy2)
+    if (level == 1) {
+        tiles.setCurrentTilemap(tilemap`level2`)
+    } else if (level == 2) {
+        tiles.setCurrentTilemap(tilemap`level0`)
+    } else if (level == 3) {
+        tiles.setCurrentTilemap(tilemap`level9`)
+    } else if (level == 4) {
+        tiles.setCurrentTilemap(tilemap`level13`)
+    } else if (level == 5) {
+        tiles.setCurrentTilemap(tilemap`level15`)
+    }
+    spawnHero()
+    spawnCoins()
+    spawnMummy()
+    spawnSkull()
+}
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     hero.setVelocity(0, jump_accel)
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile4`, function (sprite, location) {
+    game.gameOver(true)
 })
 function spawnCoins () {
     for (let value of tiles.getTilesByType(assets.tile`myTile3`)) {
@@ -27,6 +55,37 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.enemy2, function (sprite, otherS
     sprites.destroy(otherSprite)
     info.changeScoreBy(5)
     info.changeLifeBy(-1)
+})
+controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
+    animation.runImageAnimation(
+    hero,
+    [img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `],
+    500,
+    false
+    )
+})
+controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
+	
+})
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+	
 })
 function spawnMummy () {
     for (let value of tiles.getTilesByType(assets.tile`myTile1`)) {
@@ -119,6 +178,10 @@ function spawnSkull () {
         skull.setBounceOnWall(true)
     }
 }
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.collectibleInsignia, function (sprite, location) {
+    level += 1
+    advanceLevel()
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     sprites.destroy(otherSprite)
     info.changeScoreBy(5)
@@ -127,6 +190,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
 let skull: Sprite = null
 let mummy: Sprite = null
 let hero: Sprite = null
+let level = 0
 let jump_accel = 0
 let gravity = 0
 let move_speed = 0
@@ -285,8 +349,6 @@ coin = sprites.create(img`
 move_speed = 100
 gravity = 500
 jump_accel = -250
+level = 1
 info.setLife(100)
-spawnHero()
-spawnMummy()
-spawnSkull()
-spawnCoins()
+advanceLevel()
